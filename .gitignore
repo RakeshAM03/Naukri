@@ -1,0 +1,11 @@
+target/
+reports/
+screenshots/
+logs/
+*.log
+.idea/
+*.iml
+.vscode/
+.DS_Store
+testdata/*.pdf
+testdata/testdata.xlsx
