@@ -19,14 +19,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 public class LoginPage extends BasePage {
 
-    private final By loginNavLink = By.xpath("//a[normalize-space()='Login']");
-    private final By emailField = By.cssSelector("input[placeholder*='active Email ID'], #usernameField, input[type='email']");
-    private final By passwordField = By.cssSelector("input[placeholder='Enter your password'], #passwordField, input[type='password']");
+    private final By loginNavLink = By.xpath("//a[normalize-space()='Login'] | //button[normalize-space()='Login']");
+    private final By emailField = By.xpath("(//input[@id='usernameField' or @type='email' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'email')])[1]");
+    private final By passwordField = By.xpath("(//input[@id='passwordField' or @type='password' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'password')])[1]");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
     private final By loginErrorMessage = By.className("erp-msg");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
     private final By loggedInAvatar = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')]");
-    private static final String DIRECT_LOGIN_URL = "https://login.naukri.com/nLogin/Login.php";
+    private static final String DIRECT_LOGIN_URL = "https://www.naukri.com/nlogin/login.php";
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -34,12 +34,14 @@ public class LoginPage extends BasePage {
 
     /** Opens the login flyout from the homepage nav bar. */
     public LoginPage openLoginFlyout() {
+        driver.get(DIRECT_LOGIN_URL);
         try {
-            click(loginNavLink);
+            waitForVisibility(emailField);
         } catch (TimeoutException e) {
-            driver.get(DIRECT_LOGIN_URL);
+            driver.navigate().back();
+            click(loginNavLink);
+            waitForVisibility(emailField);
         }
-        waitForVisibility(emailField);
         return this;
     }
 
