@@ -1,0 +1,38 @@
+name: Naukri Automation
+
+on:
+  schedule:
+    # 9 AM to 9 PM IST every 1.5 hours (converted to UTC)
+    - cron: '30 3,5,6,8,9,11,12,14,15 * * *'
+  workflow_dispatch:
+
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Naukri Automation
+        run: |
+          mvn clean test \
+            -Dnaukri.email="${{ secrets.NAUKRI_EMAIL }}" \
+            -Dnaukri.password="${{ secrets.NAUKRI_PASSWORD }}"
+
+      - name: Upload ChainTest Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Naukri-Automation-Report
+          path: |
+            reports/chaintest/
+            target/surefire-reports/
+            screenshots/
