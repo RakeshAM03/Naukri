@@ -78,13 +78,6 @@
             <version>2.16.1</version>
         </dependency>
 
-        <!-- JUnit XML style reporting backup (Azure DevOps compatible via surefire) -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
@@ -110,21 +103,31 @@
             <!-- Surefire - runs TestNG suite, also emits JUnit-format XML
                  (surefire-reports/*.xml) which Azure DevOps 'Publish Test Results'
                  task consumes natively as a backup to ChainTest HTML reports -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>xmlfiles/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                    <testFailureIgnore>true</testFailureIgnore>
-                    <!-- ChainTest uses AspectJ weaving to intercept step/log calls -->
-                    <argLine>
-                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
-                    </argLine>
-                </configuration>
-            </plugin>
+        <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.2.5</version>
+
+    <configuration>
+        <suiteXmlFiles>
+            <suiteXmlFile>xmlfiles/testng.xml</suiteXmlFile>
+        </suiteXmlFiles>
+
+        <testFailureIgnore>false</testFailureIgnore>
+
+        <argLine>
+            -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+        </argLine>
+    </configuration>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-testng</artifactId>
+            <version>3.2.5</version>
+        </dependency>
+    </dependencies>
+</plugin>
 
         </plugins>
     </build>
