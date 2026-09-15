@@ -1,0 +1,47 @@
+name: TestNG
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Restore private resume
+        env:
+          RESUME_PDF_BASE64: ${{ secrets.RESUME_PDF_BASE64 }}
+        run: |
+          test -n "$RESUME_PDF_BASE64"
+          printf '%s' "$RESUME_PDF_BASE64" | base64 --decode > testdata/resume.pdf
+
+      - name: Run TestNG suite
+        env:
+          NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
+          NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+        run: >-
+          xvfb-run -a mvn -B test
+          -Dnaukri.email="$NAUKRI_EMAIL"
+          -Dnaukri.password="$NAUKRI_PASSWORD"
+          -Dheadless=false
+          -DresumeFilePath=testdata/resume.pdf
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            test-output/
+            screenshots/
+            reports/

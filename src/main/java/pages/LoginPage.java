@@ -3,6 +3,7 @@ package pages;
 import base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
@@ -19,12 +20,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 public class LoginPage extends BasePage {
 
     private final By loginNavLink = By.xpath("//a[normalize-space()='Login']");
-    private final By emailField = By.cssSelector("input[placeholder*='active Email ID']");
-    private final By passwordField = By.cssSelector("input[placeholder='Enter your password']");
-    private final By loginSubmitButton = By.cssSelector("button.loginButton");
+    private final By emailField = By.cssSelector("input[placeholder*='active Email ID'], #usernameField, input[type='email']");
+    private final By passwordField = By.cssSelector("input[placeholder='Enter your password'], #passwordField, input[type='password']");
+    private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
     private final By loginErrorMessage = By.className("erp-msg");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
     private final By loggedInAvatar = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')]");
+    private static final String DIRECT_LOGIN_URL = "https://login.naukri.com/nLogin/Login.php";
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -32,7 +34,11 @@ public class LoginPage extends BasePage {
 
     /** Opens the login flyout from the homepage nav bar. */
     public LoginPage openLoginFlyout() {
-        click(loginNavLink);
+        try {
+            click(loginNavLink);
+        } catch (TimeoutException e) {
+            driver.get(DIRECT_LOGIN_URL);
+        }
         waitForVisibility(emailField);
         return this;
     }

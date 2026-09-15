@@ -78,7 +78,6 @@
             <version>2.16.1</version>
         </dependency>
 
-
     </dependencies>
 
     <build>
@@ -103,31 +102,20 @@
             <!-- Surefire - runs TestNG suite, also emits JUnit-format XML
                  (surefire-reports/*.xml) which Azure DevOps 'Publish Test Results'
                  task consumes natively as a backup to ChainTest HTML reports -->
-        <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>3.2.5</version>
-
-    <configuration>
-        <suiteXmlFiles>
-            <suiteXmlFile>xmlfiles/testng.xml</suiteXmlFile>
-        </suiteXmlFiles>
-
-        <testFailureIgnore>false</testFailureIgnore>
-
-        <argLine>
-            -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
-        </argLine>
-    </configuration>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-testng</artifactId>
-            <version>3.2.5</version>
-        </dependency>
-    </dependencies>
-</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>xmlfiles/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <!-- ChainTest uses AspectJ weaving to intercept step/log calls -->
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
+                </configuration>
+            </plugin>
 
         </plugins>
     </build>

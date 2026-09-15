@@ -43,9 +43,11 @@ public class BrowserFactory {
             case "chrome" -> {
                 WebDriverManager.chromedriver().setup();
                 var options = new ChromeOptions();
-                options.addArguments("--remote-allow-origins=*", "--disable-notifications", "start-maximized");
+                options.addArguments("--remote-allow-origins=*", "--disable-notifications", "start-maximized",
+                        "--no-sandbox", "--disable-dev-shm-usage");
                 if (headless) {
-                    options.addArguments("--headless=new", "--window-size=1920,1080");
+                    options.addArguments("--headless=new", "--window-size=1920,1080",
+                            "--disable-gpu");
                 }
                 yield new ChromeDriver(options);
             }

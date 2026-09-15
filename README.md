@@ -21,7 +21,7 @@ automated access.
 
 ## 2. Credentials — do NOT hardcode them
 
-`testdata/testdata.xlsx` (sheet `login`) ships with placeholder cells:
+`testdata/testdata.example.xlsx` (sheet `login`) ships with placeholder cells:
 
 | email                  | password                 |
 |------------------------|--------------------------|
@@ -96,7 +96,7 @@ discover in a manual dry run than in an unattended 9 AM cron job.
 ```
 hybridframework/
 ├── config/config.properties
-├── testdata/testdata.xlsx            (sheet: "login")
+├── testdata/testdata.example.xlsx    (sheet: "login", placeholders only)
 ├── xmlfiles/testng.xml
 ├── src/main/java/
 │   ├── base/BaseClass.java           (ThreadLocal driver lifecycle)

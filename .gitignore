@@ -1,6 +1,7 @@
 target/
 reports/
 screenshots/
+test-output/
 logs/
 *.log
 .idea/

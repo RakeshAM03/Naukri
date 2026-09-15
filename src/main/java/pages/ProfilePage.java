@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.nio.file.Path;
+
 /**
  * Page Object for the Naukri "My Profile" page, specifically the resume
  * upload/update widget.
@@ -44,7 +46,7 @@ public class ProfilePage extends BasePage {
      */
     public void uploadResume(String absoluteResumeFilePath) {
         // click(updateResumeButton); // uncomment if the file input isn't present until the button is clicked
-        uploadFile(resumeFileInput, absoluteResumeFilePath);
+        uploadFile(resumeFileInput, Path.of(absoluteResumeFilePath).toAbsolutePath().normalize().toString());
     }
 
     public boolean isUploadSuccessful() {
