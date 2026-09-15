@@ -25,10 +25,10 @@ jobs:
         run: |
           test -n "$NAUKRI_EMAIL" || { echo "NAUKRI_EMAIL secret is not configured" >&2; exit 1; }
           test -n "$NAUKRI_PASSWORD" || { echo "NAUKRI_PASSWORD secret is not configured" >&2; exit 1; }
-          mvn -B test \
+          xvfb-run -a mvn -B test \
           -Dnaukri.email="$NAUKRI_EMAIL" \
           -Dnaukri.password="$NAUKRI_PASSWORD" \
-          -Dheadless=true \
+          -Dheadless=false \
           -DexcelFilePath=testdata/testdata.example.xlsx \
           -DresumeFilePath=testdata/resume.pdf
 

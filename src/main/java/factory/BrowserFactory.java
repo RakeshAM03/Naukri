@@ -21,8 +21,7 @@ public class BrowserFactory {
 
     public WebDriver createDriver() {
         var browser = ConfigReader.get("browser", "chrome").toLowerCase();
-        var headless = ConfigReader.getBoolean("headless")
-            || "true".equalsIgnoreCase(System.getenv("CI"));
+        var headless = ConfigReader.getBoolean("headless");
 
         WebDriver driver = switch (browser) {
             case "firefox" -> {
