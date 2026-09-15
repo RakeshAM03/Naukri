@@ -19,7 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 public class LoginPage extends BasePage {
 
-    private final By loginNavLink = By.xpath("//a[normalize-space()='Login'] | //button[normalize-space()='Login']");
+    private final By loginNavLink = By.xpath("(//a[normalize-space()='Login'] | //button[normalize-space()='Login'] | //*[@role='button' and contains(normalize-space(), 'Login')] | //*[contains(@class, 'nI-gNb-lg-rg__login')])[1]");
     private final By emailField = By.xpath("(//input[@id='usernameField' or @type='email' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'email')])[1]");
     private final By passwordField = By.xpath("(//input[@id='passwordField' or @type='password' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'password')])[1]");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
@@ -34,12 +34,12 @@ public class LoginPage extends BasePage {
 
     /** Opens the login flyout from the homepage nav bar. */
     public LoginPage openLoginFlyout() {
-        driver.get(DIRECT_LOGIN_URL);
+        driver.get(ConfigReader.get("url"));
         try {
+            click(loginNavLink);
             waitForVisibility(emailField);
         } catch (TimeoutException e) {
-            driver.navigate().back();
-            click(loginNavLink);
+            driver.get(DIRECT_LOGIN_URL);
             waitForVisibility(emailField);
         }
         return this;
