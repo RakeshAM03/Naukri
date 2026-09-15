@@ -29,12 +29,14 @@ jobs:
         env:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
-        run: >-
-          mvn -B test
-          -Dnaukri.email="$NAUKRI_EMAIL"
-          -Dnaukri.password="$NAUKRI_PASSWORD"
-          -Dheadless=true
-          -DexcelFilePath=testdata/testdata.example.xlsx
+        run: |
+          test -n "$NAUKRI_EMAIL" || { echo "NAUKRI_EMAIL secret is not configured" >&2; exit 1; }
+          test -n "$NAUKRI_PASSWORD" || { echo "NAUKRI_PASSWORD secret is not configured" >&2; exit 1; }
+          mvn -B test \
+          -Dnaukri.email="$NAUKRI_EMAIL" \
+          -Dnaukri.password="$NAUKRI_PASSWORD" \
+          -Dheadless=true \
+          -DexcelFilePath=testdata/testdata.example.xlsx \
           -DresumeFilePath=testdata/resume.pdf
 
       - name: Upload reports
