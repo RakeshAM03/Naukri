@@ -1,10 +1,16 @@
 package pages;
 
 import base.BasePage;
+import helper.ConfigReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.time.Duration;
 
 /**
  * Page Object for the Naukri.com login flyout (accessible via the "Login"
@@ -24,9 +30,10 @@ public class LoginPage extends BasePage {
     private final By passwordField = By.xpath("(//input[@id='passwordField' or @type='password' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'password')])[1]");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
     private final By loginErrorMessage = By.className("erp-msg");
+    private final By consentButton = By.xpath("//button[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'accept') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'agree') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'got it')]");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
     private final By loggedInAvatar = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')]");
-    private static final String DIRECT_LOGIN_URL = "https://www.naukri.com/nlogin/login.php";
+    private static final String DIRECT_LOGIN_URL = "https://login.naukri.com/nLogin/Login.php";
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -36,13 +43,25 @@ public class LoginPage extends BasePage {
     public LoginPage openLoginFlyout() {
         driver.get(ConfigReader.get("url"));
         try {
-            click(loginNavLink);
+            dismissConsentIfPresent();
+            var loginControl = wait.until(ExpectedConditions.presenceOfElementLocated(loginNavLink));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginControl);
             waitForVisibility(emailField);
-        } catch (TimeoutException e) {
+        } catch (WebDriverException e) {
             driver.get(DIRECT_LOGIN_URL);
             waitForVisibility(emailField);
         }
         return this;
+    }
+
+    private void dismissConsentIfPresent() {
+        try {
+            WebElement consent = new org.openqa.selenium.support.ui.WebDriverWait(driver, Duration.ofSeconds(3))
+                    .until(ExpectedConditions.elementToBeClickable(consentButton));
+            consent.click();
+        } catch (TimeoutException ignored) {
+            // No consent prompt is present.
+        }
     }
 
     public LoginPage enterEmail(String email) {
