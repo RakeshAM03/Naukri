@@ -44,7 +44,7 @@ public class BrowserFactory {
                 WebDriverManager.chromedriver().setup();
                 var options = new ChromeOptions();
                 options.addArguments("--remote-allow-origins=*", "--disable-notifications", "start-maximized",
-                        "--no-sandbox", "--disable-dev-shm-usage");
+                        "--no-sandbox", "--disable-dev-shm-usage", "--window-size=1920,1080");
                 if (headless) {
                     options.addArguments("--headless=new", "--window-size=1920,1080",
                             "--disable-gpu");
@@ -57,7 +57,7 @@ public class BrowserFactory {
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(ConfigReader.getInt("implicitWait")));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(ConfigReader.getInt("pageLoadTimeout")));
-        if (!headless) {
+        if (!headless && !"true".equalsIgnoreCase(System.getenv("CI"))) {
             driver.manage().window().maximize();
         }
 
