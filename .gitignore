@@ -9,4 +9,5 @@ logs/
 .vscode/
 .DS_Store
 testdata/*.pdf
+!testdata/resume.pdf
 testdata/testdata.xlsx
