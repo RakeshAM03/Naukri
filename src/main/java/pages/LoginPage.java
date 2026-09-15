@@ -26,8 +26,8 @@ import java.time.Duration;
 public class LoginPage extends BasePage {
 
     private final By loginNavLink = By.xpath("(//a[normalize-space()='Login'] | //button[normalize-space()='Login'] | //*[@role='button' and contains(normalize-space(), 'Login')] | //*[contains(@class, 'nI-gNb-lg-rg__login')])[1]");
-    private final By emailField = By.xpath("(//input[@id='usernameField' or @type='email' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'email')])[1]");
-    private final By passwordField = By.xpath("(//input[@id='passwordField' or @type='password' or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'password')])[1]");
+    private final By emailField = By.cssSelector("input[placeholder='Enter Email ID / Username'], input[placeholder*='Email'], input[placeholder*='Username'], #usernameField, input[type='email']");
+    private final By passwordField = By.cssSelector("input[placeholder='Enter Password'], input[placeholder*='password' i], #passwordField, input[type='password']");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
     private final By loginErrorMessage = By.className("erp-msg");
     private final By consentButton = By.xpath("//button[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'accept') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'agree') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'got it')]");
@@ -46,12 +46,29 @@ public class LoginPage extends BasePage {
             dismissConsentIfPresent();
             var loginControl = wait.until(ExpectedConditions.presenceOfElementLocated(loginNavLink));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginControl);
+            switchToLoginFrameIfPresent();
             waitForVisibility(emailField);
         } catch (WebDriverException e) {
             driver.get(DIRECT_LOGIN_URL);
+            switchToLoginFrameIfPresent();
             waitForVisibility(emailField);
         }
         return this;
+    }
+
+    private void switchToLoginFrameIfPresent() {
+        driver.switchTo().defaultContent();
+        if (!driver.findElements(emailField).isEmpty()) {
+            return;
+        }
+        for (WebElement frame : driver.findElements(By.tagName("iframe"))) {
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame(frame);
+            if (!driver.findElements(emailField).isEmpty()) {
+                return;
+            }
+        }
+        driver.switchTo().defaultContent();
     }
 
     private void dismissConsentIfPresent() {
