@@ -4,7 +4,6 @@ import base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Page Object for the Naukri.com login flyout (accessible via the "Login"
@@ -89,6 +88,7 @@ public class LoginPage extends BasePage {
 
     public void clickLogin() {
         click(loginSubmitButton);
+        driver.switchTo().defaultContent();
     }
 
     /**
@@ -115,8 +115,22 @@ public class LoginPage extends BasePage {
      * because no exception was thrown on click.
      */
     public boolean isLoginSuccessful() {
+        driver.switchTo().defaultContent();
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(loggedInAvatar));
+            wait.until(currentDriver -> {
+                if (!currentDriver.findElements(loginErrorMessage).isEmpty()
+                        && currentDriver.findElement(loginErrorMessage).isDisplayed()) {
+                    return false;
+                }
+
+                var currentUrl = currentDriver.getCurrentUrl().toLowerCase();
+                var authenticatedUrl = currentUrl.contains("/mnjuser/")
+                        || currentUrl.contains("/my-naukri")
+                        || currentUrl.contains("/dashboard");
+                var authenticatedElement = !currentDriver.findElements(loggedInAvatar).isEmpty()
+                        || !currentDriver.findElements(By.xpath("//*[contains(normalize-space(), 'My Naukri') or contains(normalize-space(), 'View Profile')]")).isEmpty();
+                return authenticatedUrl || authenticatedElement;
+            });
             return true;
         } catch (Exception e) {
             return false;
