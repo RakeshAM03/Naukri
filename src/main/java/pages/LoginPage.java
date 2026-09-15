@@ -19,24 +19,37 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  */
 public class LoginPage extends BasePage {
 
+    private final By loginNavLink = By.cssSelector("a[href*='nLogin/Login.php'], a[href*='/nlogin/login']");
     private final By emailField = By.cssSelector("input[placeholder='Enter Email ID / Username'], input[placeholder*='Email'], input[placeholder*='Username'], #usernameField, input[type='email']");
     private final By passwordField = By.cssSelector("input[placeholder='Enter Password'], input[placeholder*='password' i], #passwordField, input[type='password']");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
     private final By loginErrorMessage = By.className("erp-msg");
+    private final By consentButton = By.xpath("//button[normalize-space()='Got it' or normalize-space()='Accept' or normalize-space()='Agree']");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
     private final By loggedInAvatar = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')]");
-    private static final String DIRECT_LOGIN_URL = "https://www.naukri.com/nlogin/login";
+    private static final String HOME_URL = "https://www.naukri.com/";
 
     public LoginPage(WebDriver driver) {
         super(driver);
     }
 
-    /** Opens the login flyout from the homepage nav bar. */
+    /** Opens the login form through the homepage Login link. */
     public LoginPage openLoginFlyout() {
-        driver.get(DIRECT_LOGIN_URL);
+        driver.get(HOME_URL);
+        dismissConsentIfPresent();
+        click(loginNavLink);
         switchToLoginFrameIfPresent();
         waitForVisibility(emailField);
         return this;
+    }
+
+    private void dismissConsentIfPresent() {
+        for (WebElement consent : driver.findElements(consentButton)) {
+            if (consent.isDisplayed() && consent.isEnabled()) {
+                consent.click();
+                return;
+            }
+        }
     }
 
     private void switchToLoginFrameIfPresent() {
