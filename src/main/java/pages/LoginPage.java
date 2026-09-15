@@ -2,8 +2,11 @@ package pages;
 
 import base.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Page Object for the Naukri.com login flyout (accessible via the "Login"
@@ -18,7 +21,7 @@ import org.openqa.selenium.WebElement;
  */
 public class LoginPage extends BasePage {
 
-    private final By loginNavLink = By.xpath("(//a[contains(@href, 'nLogin/Login.php') or contains(@href, '/nlogin/login')])[1]");
+    private final By loginNavLink = By.xpath("(//a[normalize-space()='Login' or normalize-space()='Log in' or contains(@href, 'nLogin/Login.php') or contains(@href, '/nlogin/login')])[1]");
     private final By emailField = By.xpath("(//input[@placeholder='Enter Email ID / Username' or contains(@placeholder, 'Email') or contains(@placeholder, 'Username') or @id='usernameField' or @type='email'])[1]");
     private final By passwordField = By.xpath("(//input[@placeholder='Enter Password' or contains(translate(@placeholder, 'PASSWORD', 'password'), 'password') or @id='passwordField' or @type='password'])[1]");
     private final By loginSubmitButton = By.xpath("(//button[contains(@class, 'loginButton') or @type='submit'])[1]");
@@ -35,11 +38,24 @@ public class LoginPage extends BasePage {
     /** Opens the login form through the homepage Login link. */
     public LoginPage openLoginFlyout() {
         driver.get(HOME_URL);
+        wait.until(currentDriver -> "complete".equals(
+                ((JavascriptExecutor) currentDriver).executeScript("return document.readyState")));
         dismissConsentIfPresent();
-        click(loginNavLink);
+        clickLoginLink();
         switchToLoginFrameIfPresent();
         waitForVisibility(emailField);
         return this;
+    }
+
+    private void clickLoginLink() {
+        var loginLink = wait.until(ExpectedConditions.presenceOfElementLocated(loginNavLink));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center', inline:'center'});", loginLink);
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(loginNavLink)).click();
+        } catch (WebDriverException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginLink);
+        }
     }
 
     private void dismissConsentIfPresent() {
