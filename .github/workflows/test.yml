@@ -30,10 +30,11 @@ jobs:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
         run: >-
-          xvfb-run -a mvn -B test
+          mvn -B test
           -Dnaukri.email="$NAUKRI_EMAIL"
           -Dnaukri.password="$NAUKRI_PASSWORD"
-          -Dheadless=false
+          -Dheadless=true
+          -DexcelFilePath=testdata/testdata.example.xlsx
           -DresumeFilePath=testdata/resume.pdf
 
       - name: Upload reports
