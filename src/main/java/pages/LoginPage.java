@@ -4,7 +4,6 @@ import base.BasePage;
 import helper.ConfigReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -25,7 +24,7 @@ import java.time.Duration;
  */
 public class LoginPage extends BasePage {
 
-    private final By loginNavLink = By.xpath("(//a[normalize-space()='Login'] | //button[normalize-space()='Login'] | //*[@role='button' and contains(normalize-space(), 'Login')] | //*[contains(@class, 'nI-gNb-lg-rg__login')])[1]");
+    private final By loginNavLink = By.cssSelector("a[href*='nLogin/Login.php'], a[href*='/nlogin/login']");
     private final By emailField = By.cssSelector("input[placeholder='Enter Email ID / Username'], input[placeholder*='Email'], input[placeholder*='Username'], #usernameField, input[type='email']");
     private final By passwordField = By.cssSelector("input[placeholder='Enter Password'], input[placeholder*='password' i], #passwordField, input[type='password']");
     private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
@@ -44,8 +43,7 @@ public class LoginPage extends BasePage {
         driver.get(ConfigReader.get("url"));
         try {
             dismissConsentIfPresent();
-            var loginControl = wait.until(ExpectedConditions.presenceOfElementLocated(loginNavLink));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginControl);
+            click(loginNavLink);
             switchToLoginFrameIfPresent();
             waitForVisibility(emailField);
         } catch (WebDriverException e) {
