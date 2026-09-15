@@ -24,7 +24,7 @@ public class LoginPage extends BasePage {
     private final By loginNavLink = By.xpath("(//a[normalize-space()='Login' or normalize-space()='Log in' or contains(@href, 'nLogin/Login.php') or contains(@href, '/nlogin/login')])[1]");
     private final By emailField = By.xpath("(//input[@placeholder='Enter Email ID / Username' or contains(@placeholder, 'Email') or contains(@placeholder, 'Username') or @id='usernameField' or @type='email'])[1]");
     private final By passwordField = By.xpath("(//input[@placeholder='Enter Password' or contains(translate(@placeholder, 'PASSWORD', 'password'), 'password') or @id='passwordField' or @type='password'])[1]");
-    private final By loginSubmitButton = By.xpath("(//button[contains(@class, 'loginButton') or @type='submit'])[1]");
+    private final By loginSubmitButton = By.xpath("(//button[@type='submit' and not(contains(normalize-space(), 'Use OTP'))])[1]");
     private final By loginErrorMessage = By.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), ' erp-msg ')]");
     private final By consentButton = By.xpath("//button[normalize-space()='Got it' or normalize-space()='Accept' or normalize-space()='Agree']");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
