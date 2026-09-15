@@ -18,11 +18,11 @@ import org.openqa.selenium.WebElement;
  */
 public class LoginPage extends BasePage {
 
-    private final By loginNavLink = By.cssSelector("a[href*='nLogin/Login.php'], a[href*='/nlogin/login']");
-    private final By emailField = By.cssSelector("input[placeholder='Enter Email ID / Username'], input[placeholder*='Email'], input[placeholder*='Username'], #usernameField, input[type='email']");
-    private final By passwordField = By.cssSelector("input[placeholder='Enter Password'], input[placeholder*='password' i], #passwordField, input[type='password']");
-    private final By loginSubmitButton = By.cssSelector("button.loginButton, button[type='submit']");
-    private final By loginErrorMessage = By.className("erp-msg");
+    private final By loginNavLink = By.xpath("(//a[contains(@href, 'nLogin/Login.php') or contains(@href, '/nlogin/login')])[1]");
+    private final By emailField = By.xpath("(//input[@placeholder='Enter Email ID / Username' or contains(@placeholder, 'Email') or contains(@placeholder, 'Username') or @id='usernameField' or @type='email'])[1]");
+    private final By passwordField = By.xpath("(//input[@placeholder='Enter Password' or contains(translate(@placeholder, 'PASSWORD', 'password'), 'password') or @id='passwordField' or @type='password'])[1]");
+    private final By loginSubmitButton = By.xpath("(//button[contains(@class, 'loginButton') or @type='submit'])[1]");
+    private final By loginErrorMessage = By.xpath("//*[contains(concat(' ', normalize-space(@class), ' '), ' erp-msg ')]");
     private final By consentButton = By.xpath("//button[normalize-space()='Got it' or normalize-space()='Accept' or normalize-space()='Agree']");
     // Present on naukri.com once a session is authenticated (top-right avatar/dropdown)
     private final By loggedInAvatar = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')]");
@@ -66,7 +66,7 @@ public class LoginPage extends BasePage {
         if (depth >= 3) {
             return false;
         }
-        for (WebElement frame : driver.findElements(By.tagName("iframe"))) {
+        for (WebElement frame : driver.findElements(By.xpath("//iframe"))) {
             driver.switchTo().frame(frame);
             if (findLoginFrame(depth + 1)) {
                 return true;
