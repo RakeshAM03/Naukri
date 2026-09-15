@@ -4,12 +4,9 @@ import base.BasePage;
 import helper.ConfigReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import java.time.Duration;
 
 /**
  * Page Object for the Naukri.com login flyout (accessible via the "Login"
@@ -70,12 +67,11 @@ public class LoginPage extends BasePage {
     }
 
     private void dismissConsentIfPresent() {
-        try {
-            WebElement consent = new org.openqa.selenium.support.ui.WebDriverWait(driver, Duration.ofSeconds(3))
-                    .until(ExpectedConditions.elementToBeClickable(consentButton));
-            consent.click();
-        } catch (TimeoutException ignored) {
-            // No consent prompt is present.
+        for (WebElement consent : driver.findElements(consentButton)) {
+            if (consent.isDisplayed() && consent.isEnabled()) {
+                consent.click();
+                return;
+            }
         }
     }
 
