@@ -7,6 +7,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 /**
  * Page Object for the Naukri.com login flyout (accessible via the "Login"
@@ -133,14 +136,16 @@ public class LoginPage extends BasePage {
     public boolean isLoginSuccessful() {
         driver.switchTo().defaultContent();
         try {
-            wait.until(currentDriver -> {
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(currentDriver -> {
                 if (!currentDriver.findElements(loginErrorMessage).isEmpty()
                         && currentDriver.findElement(loginErrorMessage).isDisplayed()) {
                     return false;
                 }
 
                 var currentUrl = currentDriver.getCurrentUrl().toLowerCase();
-                var authenticatedUrl = currentUrl.contains("/mnjuser/")
+                var authenticatedUrl = currentUrl.contains("/mnjuser/homepage")
+                    || currentUrl.contains("/mnjuser/profile")
+                    || currentUrl.contains("/mnjuser/")
                         || currentUrl.contains("/my-naukri")
                         || currentUrl.contains("/dashboard");
                 var authenticatedElement = !currentDriver.findElements(loggedInAvatar).isEmpty()
