@@ -2,7 +2,11 @@ package pages;
 
 import base.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.nio.file.Path;
@@ -20,6 +24,8 @@ public class ProfilePage extends BasePage {
 
     private static final String PROFILE_URL = "https://www.naukri.com/mnjuser/profile";
 
+    private final By profileMenuButton = By.xpath("//div[contains(@class,'nI-gNb-drawer')] | //a[contains(@class,'nI-gNb-icon-img')] | //*[@aria-label='Profile']");
+    private final By viewProfileLink = By.xpath("(//a[contains(@href, '/mnjuser/profile') or contains(@href, '/profile')][contains(normalize-space(), 'View Profile') or contains(normalize-space(), 'My Profile')] | //*[(self::a or self::button or @role='menuitem')][contains(normalize-space(), 'View Profile') or contains(normalize-space(), 'My Profile')])[1]");
     private final By updateResumeButton = By.xpath("//span[contains(text(),'Update resume')] | //a[contains(text(),'Update resume')]");
     private final By resumeFileInput = By.xpath("//input[@type='file']");
     private final By resumeUploadSuccessMsg = By.xpath("//*[contains(normalize-space(),'Uploaded on')]");
@@ -29,11 +35,30 @@ public class ProfilePage extends BasePage {
         super(driver);
     }
 
-    /** Navigates directly to the profile page (post-login session required). */
+    /** Opens the authenticated profile through the View Profile menu item. */
     public ProfilePage goToProfile() {
-        driver.get(PROFILE_URL);
+        driver.switchTo().defaultContent();
+        try {
+            clickViewProfile();
+        } catch (TimeoutException e) {
+            driver.get(PROFILE_URL);
+        }
         wait.until(ExpectedConditions.urlContains("profile"));
         return this;
+    }
+
+    private void clickViewProfile() {
+        if (driver.findElements(viewProfileLink).isEmpty()) {
+            click(profileMenuButton);
+        }
+        var viewProfile = wait.until(ExpectedConditions.presenceOfElementLocated(viewProfileLink));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center', inline:'center'});", viewProfile);
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(viewProfileLink)).click();
+        } catch (WebDriverException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", viewProfile);
+        }
     }
 
     /**
@@ -45,7 +70,12 @@ public class ProfilePage extends BasePage {
      * reveal the input, uncomment the click(updateResumeButton) line.
      */
     public void uploadResume(String absoluteResumeFilePath) {
-        // click(updateResumeButton); // uncomment if the file input isn't present until the button is clicked
+        for (WebElement updateButton : driver.findElements(updateResumeButton)) {
+            if (updateButton.isDisplayed() && updateButton.isEnabled()) {
+                updateButton.click();
+                break;
+            }
+        }
         uploadFile(resumeFileInput, Path.of(absoluteResumeFilePath).toAbsolutePath().normalize().toString());
     }
 
