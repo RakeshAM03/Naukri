@@ -128,6 +128,13 @@ public class LoginPage extends BasePage {
         return getText(loginErrorMessage);
     }
 
+    public String getLoginStatus() {
+        driver.switchTo().defaultContent();
+        var errors = driver.findElements(loginErrorMessage);
+        var errorText = errors.isEmpty() ? "none" : errors.get(0).getText();
+        return "url=" + driver.getCurrentUrl() + ", error=" + errorText;
+    }
+
     /**
      * Waits for a post-login indicator (nav avatar/drawer) to confirm the
      * session actually authenticated, rather than assuming success just
@@ -150,7 +157,10 @@ public class LoginPage extends BasePage {
                         || currentUrl.contains("/dashboard");
                 var authenticatedElement = !currentDriver.findElements(loggedInAvatar).isEmpty()
                         || !currentDriver.findElements(By.xpath("//*[contains(normalize-space(), 'My Naukri') or contains(normalize-space(), 'View Profile')]")).isEmpty();
-                return authenticatedUrl || authenticatedElement;
+                var loginFormClosed = currentDriver.findElements(emailField).stream().noneMatch(WebElement::isDisplayed)
+                    && currentDriver.findElements(passwordField).stream().noneMatch(WebElement::isDisplayed);
+                var noLongerOnLoginPage = !currentUrl.contains("/nlogin/") && !currentUrl.contains("login.naukri.com");
+                return authenticatedUrl || authenticatedElement || (noLongerOnLoginPage && loginFormClosed);
             });
             return true;
         } catch (Exception e) {

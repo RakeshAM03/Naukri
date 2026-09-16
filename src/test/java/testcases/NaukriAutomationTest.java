@@ -39,7 +39,7 @@ public class NaukriAutomationTest extends BaseClass {
         loginPage.login(email, password);
 
         Assert.assertTrue(loginPage.isLoginSuccessful(),
-                "Login did not succeed for user: " + email);
+            "Login did not succeed for user: " + email + ". " + loginPage.getLoginStatus());
 
         ProfilePage profilePage = new ProfilePage(getDriver());
         profilePage.goToProfile();
